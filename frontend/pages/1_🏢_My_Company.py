@@ -3,6 +3,14 @@ TenderFit - Company Profile and Registration Page
 Allows companies to register, update profile attributes, and upload statutory & financial proof documents.
 """
 
+import sys
+from pathlib import Path
+
+# Ensure project root is always on sys.path
+ROOT_DIR = Path(__file__).resolve().parent.parent.parent
+if str(ROOT_DIR) not in sys.path:
+    sys.path.insert(0, str(ROOT_DIR))
+
 import streamlit as st
 from config.settings import settings
 from frontend.components.theme import apply_theme, format_inr

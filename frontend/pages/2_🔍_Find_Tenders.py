@@ -3,10 +3,17 @@ TenderFit - Find Tenders Page
 Automated Playwright Tender Discovery & Direct Tender PDF Ingestion / AI Eligibility Checker.
 """
 
+import sys
+from pathlib import Path
+
+# Ensure project root is always on sys.path
+ROOT_DIR = Path(__file__).resolve().parent.parent.parent
+if str(ROOT_DIR) not in sys.path:
+    sys.path.insert(0, str(ROOT_DIR))
+
 import streamlit as st
 import pandas as pd
 from datetime import datetime, timedelta
-from pathlib import Path
 
 from config.settings import settings
 from backend.database import SessionLocal
