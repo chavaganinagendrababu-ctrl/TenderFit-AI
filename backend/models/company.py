@@ -3,11 +3,15 @@ TenderFit - Company Models
 Defines the database schema for Company profiles and uploaded supporting documents.
 """
 
-from datetime import datetime
+from datetime import datetime, timezone
 from sqlalchemy import Column, Integer, String, Float, Boolean, Text, DateTime, ForeignKey
 from sqlalchemy.orm import relationship
 
 from backend.database import Base
+
+
+def utc_now():
+    return datetime.now(timezone.utc)
 
 
 class Company(Base):
@@ -35,8 +39,8 @@ class Company(Base):
     # Specialisations & Capabilities (comma-separated or JSON list)
     specialisations = Column(Text, nullable=True)
 
-    created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
-    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow, nullable=False)
+    created_at = Column(DateTime, default=utc_now, nullable=False)
+    updated_at = Column(DateTime, default=utc_now, onupdate=utc_now, nullable=False)
 
     # Relationships
     documents = relationship("CompanyDocument", back_populates="company", cascade="all, delete-orphan")
@@ -63,7 +67,7 @@ class CompanyDocument(Base):
     # Optional metadata or extracted details stored as JSON string
     extracted_data_json = Column(Text, nullable=True)
     
-    uploaded_at = Column(DateTime, default=datetime.utcnow, nullable=False)
+    uploaded_at = Column(DateTime, default=utc_now, nullable=False)
 
     # Relationships
     company = relationship("Company", back_populates="documents")

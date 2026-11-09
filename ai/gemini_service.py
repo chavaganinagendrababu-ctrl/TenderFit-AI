@@ -112,10 +112,13 @@ class GeminiRequirementExtractor:
             except Exception:
                 pass
 
-        # 2. Experience heuristic (e.g., 4 years of experience)
+        # 2. Experience heuristic (e.g., 4 years of operational experience)
         exp_years = None
         exp_clause = None
-        exp_match = re.search(r'(\d+)\s*(?:years?|yrs?)\s*(?:of\s+)?experience', text_lower)
+        exp_match = re.search(r'(\d+)\s*(?:years?|yrs?)\s*(?:of\s+)?(?:[\w-]+\s+){0,3}experience', text_lower)
+        if not exp_match:
+            exp_match = re.search(r'experience\s*(?:of\s+)?(?:at\s+least\s*)?(\d+)\s*(?:years?|yrs?)', text_lower)
+
         if exp_match:
             try:
                 exp_years = int(exp_match.group(1))
@@ -123,10 +126,13 @@ class GeminiRequirementExtractor:
             except Exception:
                 pass
 
-        # 3. Previous projects (e.g. completed 2 similar works)
+        # 3. Previous projects (e.g. completed at least 2 similar highway paving projects)
         proj_count = None
         proj_clause = None
-        proj_match = re.search(r'completed\s*(?:at\s+least\s*)?(\d+)\s*(?:similar)?\s*(?:projects?|works?)', text_lower)
+        proj_match = re.search(r'completed\s*(?:at\s+least\s*)?(\d+)\s*(?:similar)?\s*(?:[\w-]+\s+){0,5}(?:projects?|works?)', text_lower)
+        if not proj_match:
+            proj_match = re.search(r'(\d+)\s*(?:similar\s+)?(?:completed\s+)?(?:projects?|works?)', text_lower)
+
         if proj_match:
             try:
                 proj_count = int(proj_match.group(1))

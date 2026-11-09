@@ -3,11 +3,15 @@ TenderFit - Tender and Eligibility Models
 Defines schemas for discovered tenders, extracted requirements, and match assessments.
 """
 
-from datetime import datetime
+from datetime import datetime, timezone
 from sqlalchemy import Column, Integer, String, Float, Boolean, Text, DateTime, ForeignKey
 from sqlalchemy.orm import relationship
 
 from backend.database import Base
+
+
+def utc_now():
+    return datetime.now(timezone.utc)
 
 
 class Tender(Base):
@@ -30,8 +34,8 @@ class Tender(Base):
     portal_name = Column(String(100), nullable=False, default="Public Tender Portal")
     category = Column(String(100), nullable=True)
     
-    created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
-    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow, nullable=False)
+    created_at = Column(DateTime, default=utc_now, nullable=False)
+    updated_at = Column(DateTime, default=utc_now, onupdate=utc_now, nullable=False)
 
     # Relationships
     requirements = relationship("TenderRequirement", back_populates="tender", uselist=False, cascade="all, delete-orphan")
@@ -65,7 +69,7 @@ class TenderRequirement(Base):
     raw_conditions_json = Column(Text, nullable=True)
     evidence_clauses_json = Column(Text, nullable=True)       # Exact clauses extracted from PDF for auditability
 
-    extracted_at = Column(DateTime, default=datetime.utcnow, nullable=False)
+    extracted_at = Column(DateTime, default=utc_now, nullable=False)
 
     # Relationships
     tender = relationship("Tender", back_populates="requirements")
@@ -90,7 +94,7 @@ class EligibilityResult(Base):
     missing_documents_json = Column(Text, nullable=True)     # Missing certificates or proofs list
     verification_warnings_json = Column(Text, nullable=True) # Items requiring manual clarification
 
-    evaluated_at = Column(DateTime, default=datetime.utcnow, nullable=False)
+    evaluated_at = Column(DateTime, default=utc_now, nullable=False)
 
     # Relationships
     company = relationship("Company", back_populates="eligibility_results")
