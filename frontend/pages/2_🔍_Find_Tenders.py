@@ -13,7 +13,7 @@ if str(ROOT_DIR) not in sys.path:
 
 import streamlit as st
 import pandas as pd
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 
 from config.settings import settings
 from backend.database import SessionLocal
@@ -171,7 +171,7 @@ with tab_direct_pdf:
     with p_col2:
         t_loc = st.text_input("Project Location *", placeholder="e.g. Nagpur, Maharashtra")
         t_val = st.number_input("Estimated Tender Value (INR)", min_value=0.0, value=30000000.0, step=1000000.0)
-        t_deadline = st.date_input("Closing Date", value=datetime.utcnow() + timedelta(days=30))
+        t_deadline = st.date_input("Closing Date", value=datetime.now(timezone.utc) + timedelta(days=30))
 
     uploaded_pdf = st.file_uploader("Upload Tender Specification PDF (NIT / Corrigendum)", type=["pdf"])
 
