@@ -1,0 +1,42 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual Environment
+myenv/
+env/
+venv/
+.venv/
+
+# Environment Variables & Secrets
+.env
+*.env.local
+
+# Databases & SQLite
+*.db
+*.sqlite
+*.sqlite3
+tenderfit.db
+
+# Storage Directories (Preserve folders, ignore contents)
+documents/company_documents/*
+!documents/company_documents/.gitkeep
+documents/tender_documents/*
+!documents/tender_documents/.gitkeep
+reports/*
+!reports/.gitkeep
+
+# Pytest / Coverage
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Playwright
+.playwright/
+test-results/
+
+# OS Specific
+.DS_Store
+Thumbs.db
+
