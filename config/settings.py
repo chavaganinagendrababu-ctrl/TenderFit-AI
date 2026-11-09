@@ -47,6 +47,20 @@ class Settings(BaseSettings):
 
 settings = Settings()
 
+# Check Streamlit Cloud secrets integration
+try:
+    import streamlit as st
+    if hasattr(st, "secrets"):
+        if "GEMINI_API_KEY" in st.secrets and st.secrets["GEMINI_API_KEY"]:
+            settings.GEMINI_API_KEY = str(st.secrets["GEMINI_API_KEY"])
+        if "DATABASE_URL" in st.secrets and st.secrets["DATABASE_URL"]:
+            settings.DATABASE_URL = str(st.secrets["DATABASE_URL"])
+        if "GEMINI_MODEL" in st.secrets and st.secrets["GEMINI_MODEL"]:
+            settings.GEMINI_MODEL = str(st.secrets["GEMINI_MODEL"])
+except Exception:
+    # Streamlit not initialized or running outside Streamlit context
+    pass
+
 # Ensure directories exist
 settings.COMPANY_DOCS_DIR.mkdir(parents=True, exist_ok=True)
 settings.TENDER_DOCS_DIR.mkdir(parents=True, exist_ok=True)

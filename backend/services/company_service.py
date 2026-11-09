@@ -13,6 +13,10 @@ from backend.schemas.company import CompanyCreate, CompanyUpdate
 from config.settings import settings
 
 
+ALLOWED_EXTENSIONS = {".pdf", ".png", ".jpg", ".jpeg"}
+MAX_FILE_SIZE_BYTES = 15 * 1024 * 1024  # 15 MB limit
+
+
 class CompanyService:
     @staticmethod
     def get_by_id(db: Session, company_id: int) -> Optional[Company]:
@@ -83,7 +87,7 @@ class CompanyService:
         file_name: str,
         content: bytes,
     ) -> CompanyDocument:
-        """Saves an uploaded document to disk and creates a database record."""
+        """Saves an uploaded document safely to disk and creates a database record."""
         company = CompanyService.get_by_id(db, company_id)
         if not company:
             raise HTTPException(
@@ -91,19 +95,39 @@ class CompanyService:
                 detail=f"Company with ID {company_id} not found."
             )
 
+        # 1. File size enforcement
+        if len(content) > MAX_FILE_SIZE_BYTES:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail=f"File exceeds maximum allowed size of 15 MB ({len(content)} bytes)."
+            )
+
+        # 2. Path Traversal & Filename sanitization
+        base_name = Path(file_name).name
+        ext = Path(base_name).suffix.lower()
+        if ext not in ALLOWED_EXTENSIONS:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail=f"File type '{ext}' is not permitted. Allowed: {', '.join(ALLOWED_EXTENSIONS)}."
+            )
+
+        import re
+        clean_name = re.sub(r'[<>:"/\\|?*]', '_', base_name)
+        clean_doc_type = re.sub(r'[<>:"/\\|?*]', '_', document_type.upper().strip())
+
         # Company-specific folder
         company_folder = settings.COMPANY_DOCS_DIR / f"company_{company_id}"
         company_folder.mkdir(parents=True, exist_ok=True)
 
-        safe_filename = f"{document_type.upper()}_{file_name}"
+        safe_filename = f"{clean_doc_type}_{clean_name}"
         dest_path = company_folder / safe_filename
         with open(dest_path, "wb") as f:
             f.write(content)
 
         doc = CompanyDocument(
             company_id=company_id,
-            document_type=document_type.upper(),
-            file_name=file_name,
+            document_type=clean_doc_type,
+            file_name=clean_name,
             file_path=str(dest_path),
             file_size_bytes=len(content),
         )

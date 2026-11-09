@@ -24,18 +24,35 @@ class BrowserManager:
         self._browser: Optional[Browser] = None
 
     def start(self) -> Browser:
-        """Launches a Chromium browser instance."""
+        """Launches a Chromium browser instance. Auto-installs Chromium if missing in cloud containers."""
         if not self._browser:
             logger.info(f"Launching Playwright Chromium (headless={self.headless})...")
             self._playwright = sync_playwright().start()
-            self._browser = self._playwright.chromium.launch(
-                headless=self.headless,
-                args=[
-                    "--no-sandbox",
-                    "--disable-dev-shm-usage",
-                    "--disable-blink-features=AutomationControlled",
-                ],
-            )
+            try:
+                self._browser = self._playwright.chromium.launch(
+                    headless=self.headless,
+                    args=[
+                        "--no-sandbox",
+                        "--disable-dev-shm-usage",
+                        "--disable-blink-features=AutomationControlled",
+                    ],
+                )
+            except Exception as e:
+                err_text = str(e).lower()
+                if "playwright install" in err_text or "executable doesn't exist" in err_text:
+                    logger.info("Chromium binary missing. Attempting self-healing 'playwright install chromium'...")
+                    import sys, subprocess
+                    subprocess.run([sys.executable, "-m", "playwright", "install", "chromium"], check=True)
+                    self._browser = self._playwright.chromium.launch(
+                        headless=self.headless,
+                        args=[
+                            "--no-sandbox",
+                            "--disable-dev-shm-usage",
+                            "--disable-blink-features=AutomationControlled",
+                        ],
+                    )
+                else:
+                    raise
         return self._browser
 
     def new_context(self) -> BrowserContext:

@@ -186,10 +186,15 @@ with tab_direct_pdf:
                 tender_text = ""
 
                 if uploaded_pdf:
-                    # Save PDF to tender documents directory
-                    tender_dir = settings.TENDER_DOCS_DIR / t_id.replace("/", "_")
+                    # Sanitize folder and filename
+                    import re
+                    safe_id = re.sub(r'[<>:"/\\|?*]', '_', t_id.strip())
+                    clean_pdf_name = re.sub(r'[<>:"/\\|?*]', '_', Path(uploaded_pdf.name).name)
+
+                    # Save PDF to isolated tender documents directory
+                    tender_dir = settings.TENDER_DOCS_DIR / safe_id
                     tender_dir.mkdir(parents=True, exist_ok=True)
-                    saved_pdf_path = tender_dir / uploaded_pdf.name
+                    saved_pdf_path = tender_dir / clean_pdf_name
                     with open(saved_pdf_path, "wb") as f:
                         f.write(uploaded_pdf.getvalue())
 

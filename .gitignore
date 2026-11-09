@@ -2,24 +2,33 @@
 __pycache__/
 *.py[cod]
 *$py.class
+*.pyc
+*.pyo
+*.pyd
 
-# Virtual Environment
+# Virtual Environments
 myenv/
 env/
 venv/
 .venv/
+ENV/
+env.bak/
+venv.bak/
 
 # Environment Variables & Secrets
 .env
-*.env.local
+.env.*
+!.env.example
+.streamlit/secrets.toml
 
-# Databases & SQLite
+# Databases & Local SQLite
 *.db
 *.sqlite
 *.sqlite3
 tenderfit.db
+tenderfit.db-journal
 
-# Storage Directories (Preserve folders, ignore contents)
+# Storage Directories (Preserve folder structure with .gitkeep, ignore contents)
 documents/company_documents/*
 !documents/company_documents/.gitkeep
 documents/tender_documents/*
@@ -27,16 +36,33 @@ documents/tender_documents/*
 reports/*
 !reports/.gitkeep
 
-# Pytest / Coverage
+# Pytest / Coverage / Testing Artifacts
 .pytest_cache/
 .coverage
 htmlcov/
+.tox/
+.nox/
 
-# Playwright
+# Playwright Binaries & Test Results
 .playwright/
 test-results/
 
-# OS Specific
-.DS_Store
-Thumbs.db
+# Temporary Logs
+*.log
+logs/
 
+# IDE & Editor Specific
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# OS Generated Files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
